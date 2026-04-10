@@ -16,6 +16,7 @@ const prettyTypes = {
   jsonl: "Taxonium JSONL",
   nwk: "Newick tree",
   nexus: "Nexus tree",
+  alife: "ALife Standard CSV",
   meta_tsv: "Metadata TSV",
   meta_csv: "Metadata CSV",
   nextstrain: "Nextstrain JSON",
@@ -96,7 +97,7 @@ export const InputSupplier = ({ inputHelper, className }) => {
                 <BsTrash className="inline-block mx-1" />
               </Button>
             </div>{" "}
-            {input.filetype === "nwk" && (
+            {(input.filetype === "nwk" || input.filetype === "alife") && (
               <div>
                 <label>
                   <input
@@ -162,7 +163,7 @@ export const InputSupplier = ({ inputHelper, className }) => {
       )}
       <div className="mb-3">
         Select, drag-and-drop, or enter the URL for tree or metadata files
-        (jsonl, newick, nextstrain, tsv, etc.):
+        (jsonl, newick, nextstrain, alife csv, tsv, etc.):
       </div>
       {!addingText && (
         <>

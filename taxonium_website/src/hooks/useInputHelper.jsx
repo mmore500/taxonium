@@ -130,7 +130,10 @@ export const useInputHelper = ({
     // can't have more than one tree file
     if (
       inputs.filter(
-        (input) => input.filetype === "nwk" || input.filetype === "nexus"
+        (input) =>
+          input.filetype === "nwk" ||
+          input.filetype === "nexus" ||
+          input.filetype === "alife"
       ).length > 1
     ) {
       return ["invalid", "You can only use a single tree file"];
@@ -142,7 +145,10 @@ export const useInputHelper = ({
     if (
       inputs.filter((input) => input.filetype === "jsonl").length === 0 &&
       inputs.filter(
-        (input) => input.filetype === "nwk" || input.filetype === "nexus"
+        (input) =>
+          input.filetype === "nwk" ||
+          input.filetype === "nexus" ||
+          input.filetype === "alife"
       ).length === 0 &&
       inputs.filter((input) => input.filetype === "nextstrain").length === 0
     ) {
@@ -185,7 +191,8 @@ export const useInputHelper = ({
           (input) =>
             input.filetype === "nwk" ||
             input.filetype === "nextstrain" ||
-            input.filetype === "nexus"
+            input.filetype === "nexus" ||
+            input.filetype === "alife"
         );
         const newQuery = {
           treeUrl: tree_file.name,
@@ -228,7 +235,8 @@ export const useInputHelper = ({
         (input) =>
           input.filetype === "nwk" ||
           input.filetype === "nextstrain" ||
-          input.filetype === "nexus"
+          input.filetype === "nexus" ||
+          input.filetype === "alife"
       );
 
       upload_obj.filename = tree_file.name;
@@ -242,8 +250,11 @@ export const useInputHelper = ({
   }, [inputs, updateQuery, setUploadedData]);
 
   useEffect(() => {
-    // if there is a single file and it is a jsonl file, then finalise
-    if (inputs.length === 1 && inputs[0].filetype === "jsonl") {
+    // if there is a single file and it is a jsonl or alife file, then finalise
+    if (
+      inputs.length === 1 &&
+      (inputs[0].filetype === "jsonl" || inputs[0].filetype === "alife")
+    ) {
       finaliseInputs();
     }
   }, [inputs, finaliseInputs]);

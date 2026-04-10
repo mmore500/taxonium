@@ -6,6 +6,7 @@ import {
 } from "taxonium_data_handling/importing.js";
 import { processNewickAndMetadata } from "../utils/processNewick";
 import { processNextstrain } from "../utils/processNextstrain.js";
+import { processAlife } from "../utils/processAlife";
 import { ReadableWebToNodeStream } from "readable-web-to-node-stream";
 import { parser } from "stream-json";
 import { streamValues } from "stream-json/streamers/StreamValues";
@@ -219,6 +220,16 @@ onmessage = async (event) => {
     data.data.filetype === "nextstrain"
   ) {
     processedUploadedData = await processNextstrain(
+      data.data,
+      sendStatusMessage
+    );
+  } else if (
+    data.type === "upload" &&
+    data.data &&
+    data.data.filename &&
+    data.data.filetype === "alife"
+  ) {
+    processedUploadedData = await processAlife(
       data.data,
       sendStatusMessage
     );

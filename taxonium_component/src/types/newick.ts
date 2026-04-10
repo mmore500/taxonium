@@ -17,6 +17,11 @@ export interface NewickFile extends InputFile {
   taxonColumn?: string;
 }
 
+export interface AlifeFile extends InputFile {
+  filetype: "alife";
+  ladderize?: boolean;
+}
+
 import type { Node, Mutation } from "./node";
 
 export interface ProcessedTree {
