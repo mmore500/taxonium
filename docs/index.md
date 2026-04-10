@@ -47,7 +47,7 @@ Taxonium can also display JSONL files containing mutation-annotated trees (discu
 
 #### ALife Standard phylogeny CSV
 
-Taxonium supports CSV files following the [ALife Data Standard](https://alife-data-standards.github.io/alife-data-standards/phylogeny.html) for phylogenetic data. These files represent a phylogeny as a tabular edge list: each row defines a node via its `id` and its parent via `ancestor_list` (or the unofficial `ancestor_id` extension for single-parent trees). This is analogous to the `edge` matrix in R's ape `phylo` object, where each entry pairs a parent node to a child node. If an `origin_time` column is present, branch lengths are computed as the difference between a node's origin time and its parent's origin time (similar to `edge.length` in a `phylo` object). Any additional columns are treated as node metadata.
+Taxonium supports CSV files following the [ALife Data Standard](https://alife-data-standards.github.io/alife-data-standards/phylogeny.html) for phylogenetic data. These files represent a phylogeny as a tabular edge list: each row defines a node via its `id` and its parent via `ancestor_list` or `ancestor_id`. This is analogous to the `edge` matrix in R's ape `phylo` object, where each entry pairs a parent node to a child node. If an `origin_time` column is present, branch lengths are computed as the difference between a node's origin time and its parent's origin time (similar to `edge.length` in a `phylo` object). Any additional columns are treated as node metadata.
 
 To use this format, upload your CSV file and select "ALife Standard CSV" from the file type dropdown.
 
