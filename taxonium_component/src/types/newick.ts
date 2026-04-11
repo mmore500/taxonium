@@ -18,7 +18,12 @@ export interface NewickFile extends InputFile {
 }
 
 export interface AlifeFile extends InputFile {
-  filetype: "alife";
+  filetype: "alife_csv" | "alife_tsv";
+  ladderize?: boolean;
+}
+
+export interface AlifeParquetFile extends InputFile {
+  filetype: "alife_parquet";
   ladderize?: boolean;
 }
 

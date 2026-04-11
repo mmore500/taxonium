@@ -67,25 +67,17 @@ function resolveParentId(
   return null;
 }
 
-export async function processAlife(
-  data: AlifeFile,
+/**
+ * Shared tree-building logic for ALife standard data.
+ * Takes pre-parsed data (same format as processMetadataFile output) and
+ * builds a ProcessedTree. Used by both CSV/TSV and Parquet paths.
+ */
+export async function buildAlifeTreeFromParsedData(
+  parsedMap: Map<string, Record<string, string>>,
+  headers: string[],
+  ladderize: boolean | undefined,
   sendStatusMessage: (msg: StatusMessage) => void
 ): Promise<ProcessedTree> {
-  sendStatusMessage({ message: "Parsing ALife CSV file" });
-
-  // Reuse processMetadataFile to parse the CSV.
-  // Column 0 becomes the map key; all other columns get meta_ prefix.
-  const metadataInput: MetadataFile = {
-    status: data.status,
-    filename: data.filename,
-    data: data.data,
-    filetype: "meta_csv",
-  };
-  const [parsedMap, headers] = await processMetadataFile(
-    metadataInput,
-    sendStatusMessage
-  );
-
   // Determine which column is which
   const col0 = headers[0];
   const otherHeaders = headers.slice(1);
@@ -96,10 +88,10 @@ export async function processAlife(
   if (!hasAncestorId && !hasAncestorList) {
     sendStatusMessage({
       error:
-        "ALife CSV must have an 'ancestor_list' or 'ancestor_id' column",
+        "ALife data must have an 'ancestor_list' or 'ancestor_id' column",
     });
     throw new Error(
-      "ALife CSV must have an 'ancestor_list' or 'ancestor_id' column"
+      "ALife data must have an 'ancestor_list' or 'ancestor_id' column"
     );
   }
 
@@ -130,8 +122,8 @@ export async function processAlife(
   }
 
   if (rows.length === 0) {
-    sendStatusMessage({ error: "ALife CSV contains no valid data rows" });
-    throw new Error("ALife CSV contains no valid data rows");
+    sendStatusMessage({ error: "ALife data contains no valid data rows" });
+    throw new Error("ALife data contains no valid data rows");
   }
 
   sendStatusMessage({ message: "Building tree structure" });
@@ -206,8 +198,8 @@ export async function processAlife(
   }
 
   if (rootNodes.length === 0) {
-    sendStatusMessage({ error: "ALife CSV has no root node (no node without an ancestor)" });
-    throw new Error("ALife CSV has no root node");
+    sendStatusMessage({ error: "ALife data has no root node (no node without an ancestor)" });
+    throw new Error("ALife data has no root node");
   }
 
   // Determine the root
@@ -284,7 +276,7 @@ export async function processAlife(
   const total_tips = root.num_tips!;
 
   // Optionally ladderize
-  if (data.ladderize) {
+  if (ladderize) {
     const sortStack: JsTreeNode[] = [root];
     while (sortStack.length > 0) {
       const node = sortStack.pop()!;
@@ -370,4 +362,27 @@ export async function processAlife(
   };
 
   return output;
+}
+
+export async function processAlife(
+  data: AlifeFile,
+  sendStatusMessage: (msg: StatusMessage) => void
+): Promise<ProcessedTree> {
+  const isTsv = data.filetype === "alife_tsv";
+  sendStatusMessage({ message: `Parsing ALife ${isTsv ? "TSV" : "CSV"} file` });
+
+  // Reuse processMetadataFile to parse the CSV/TSV.
+  // Column 0 becomes the map key; all other columns get meta_ prefix.
+  const metadataInput: MetadataFile = {
+    status: data.status,
+    filename: data.filename,
+    data: data.data,
+    filetype: isTsv ? "meta_tsv" : "meta_csv",
+  };
+  const [parsedMap, headers] = await processMetadataFile(
+    metadataInput,
+    sendStatusMessage
+  );
+
+  return buildAlifeTreeFromParsedData(parsedMap, headers, data.ladderize, sendStatusMessage);
 }

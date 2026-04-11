@@ -15,41 +15,43 @@ function guessType(file_object) {
   const file_name = file_object.name.toLowerCase().replace(".gz", "");
   const file_extension = file_name.split(".").pop();
 
-  const tree_extensions = [
-    "nwk",
-    "newick",
-    "contree",
-    "tree",
-    "tre",
-    "nh",
-    "phy",
-    "nw",
-    "treefile",
-    "rooted",
-  ];
+  // const tree_extensions = [
+  //   "nwk",
+  //   "newick",
+  //   "contree",
+  //   "tree",
+  //   "tre",
+  //   "nh",
+  //   "phy",
+  //   "nw",
+  //   "treefile",
+  //   "rooted",
+  // ];
 
-  if (tree_extensions.includes(file_extension)) {
-    return "nwk";
-  }
+  // if (tree_extensions.includes(file_extension)) {
+  //   return "nwk";
+  // }
 
-  if (file_extension === "nexus" || file_extension === "nex") {
-    return "nexus";
-  }
+  // if (file_extension === "nexus" || file_extension === "nex") {
+  //   return "nexus";
+  // }
 
-  if (file_extension === "jsonl") {
-    return "jsonl";
-  }
+  // if (file_extension === "jsonl") {
+  //   return "jsonl";
+  // }
   if (file_extension === "csv") {
-    return "meta_csv";
+    return "alife_csv";
   }
   if (file_extension === "tsv") {
-    return "meta_tsv";
+    return "alife_tsv";
   }
-  if (file_extension === "json") {
-    return "nextstrain";
-  } else {
-    return "unknown";
+  if (file_extension === "parquet" || file_extension === "pqt") {
+    return "alife_parquet";
   }
+  // if (file_extension === "json") {
+  //   return "nextstrain";
+  // }
+  return "unknown";
 }
 
 export const useInputHelper = ({
@@ -111,29 +113,29 @@ export const useInputHelper = ({
       return ["invalid", "No files selected"];
     }
 
-    // if there is a jsonl file, it must be the only file
-    if (
-      inputs.some((input) => input.filetype === "jsonl") &&
-      inputs.length > 1
-    ) {
-      return [
-        "invalid",
-        "If using Taxonium JSONL files, you can only use a single file at present",
-      ];
-    }
-    // can't have more than one metadata file
-    if (
-      inputs.filter((input) => input.filetype.startsWith("meta_")).length > 1
-    ) {
-      return ["invalid", "You can only use a single metadata file"];
-    }
+    // // if there is a jsonl file, it must be the only file
+    // if (
+    //   inputs.some((input) => input.filetype === "jsonl") &&
+    //   inputs.length > 1
+    // ) {
+    //   return [
+    //     "invalid",
+    //     "If using Taxonium JSONL files, you can only use a single file at present",
+    //   ];
+    // }
+    // // can't have more than one metadata file
+    // if (
+    //   inputs.filter((input) => input.filetype.startsWith("meta_")).length > 1
+    // ) {
+    //   return ["invalid", "You can only use a single metadata file"];
+    // }
     // can't have more than one tree file
     if (
       inputs.filter(
         (input) =>
-          input.filetype === "nwk" ||
-          input.filetype === "nexus" ||
-          input.filetype === "alife"
+          input.filetype === "alife_csv" ||
+          input.filetype === "alife_tsv" ||
+          input.filetype === "alife_parquet"
       ).length > 1
     ) {
       return ["invalid", "You can only use a single tree file"];
@@ -141,20 +143,18 @@ export const useInputHelper = ({
     if (inputs.some((input) => input.filetype === "unknown")) {
       return ["invalid", "Please select the type of each file"];
     }
-    // must have a tree file or a jsonl
+    // must have a tree file
     if (
-      inputs.filter((input) => input.filetype === "jsonl").length === 0 &&
       inputs.filter(
         (input) =>
-          input.filetype === "nwk" ||
-          input.filetype === "nexus" ||
-          input.filetype === "alife"
-      ).length === 0 &&
-      inputs.filter((input) => input.filetype === "nextstrain").length === 0
+          input.filetype === "alife_csv" ||
+          input.filetype === "alife_tsv" ||
+          input.filetype === "alife_parquet"
+      ).length === 0
     ) {
       return [
         "invalid",
-        "You must also add a tree file to go with your metadata",
+        "You must add an ALife Standard tree file (CSV, TSV, or Parquet)",
       ];
     }
     return ["valid", ""];
@@ -180,63 +180,27 @@ export const useInputHelper = ({
   const finaliseInputs = useCallback(() => {
     // if everything is a URL:
     if (inputs.every((input) => input.supplyType === "url")) {
-      // if the input is a taxonium file
-      if (inputs[0].filetype === "jsonl") {
-        updateQuery({ protoUrl: inputs[0].name });
-      } else {
-        const meta_file = inputs.find((input) =>
-          input.filetype.startsWith("meta_")
-        );
-        const tree_file = inputs.find(
-          (input) =>
-            input.filetype === "nwk" ||
-            input.filetype === "nextstrain" ||
-            input.filetype === "nexus" ||
-            input.filetype === "alife"
-        );
-        const newQuery = {
-          treeUrl: tree_file.name,
-          ladderizeTree: tree_file.ladderize === true,
-          treeType: tree_file.filetype,
-        };
-        if (meta_file) {
-          newQuery.metaUrl = meta_file.name;
-          newQuery.metaType = meta_file.filetype;
-        }
-        updateQuery(newQuery);
-      }
-    } else {
-      if (inputs[0].filetype === "jsonl") {
-        setUploadedData({
-          status: "loaded",
-          filename: inputs[0].name,
-          data: inputs[0].data,
-          filetype: inputs[0].filetype,
-        });
-        return;
-      }
-
-      const upload_obj = {};
-      // if there is some metadata find it
-      const meta_file = inputs.find((input) =>
-        input.filetype.startsWith("meta_")
+      const tree_file = inputs.find(
+        (input) =>
+          input.filetype === "alife_csv" ||
+          input.filetype === "alife_tsv" ||
+          input.filetype === "alife_parquet"
       );
-      if (meta_file) {
-        upload_obj.metadata = {
-          filename: meta_file.name,
-          data: meta_file.data,
-          status: meta_file.supplyType === "url" ? "url_supplied" : "loaded",
-          filetype: meta_file.filetype,
-        };
-      }
+      const newQuery = {
+        treeUrl: tree_file.name,
+        ladderizeTree: tree_file.ladderize === true,
+        treeType: tree_file.filetype,
+      };
+      updateQuery(newQuery);
+    } else {
+      const upload_obj = {};
 
       // if there is a tree file find it
       const tree_file = inputs.find(
         (input) =>
-          input.filetype === "nwk" ||
-          input.filetype === "nextstrain" ||
-          input.filetype === "nexus" ||
-          input.filetype === "alife"
+          input.filetype === "alife_csv" ||
+          input.filetype === "alife_tsv" ||
+          input.filetype === "alife_parquet"
       );
 
       upload_obj.filename = tree_file.name;
@@ -250,44 +214,30 @@ export const useInputHelper = ({
   }, [inputs, updateQuery, setUploadedData]);
 
   useEffect(() => {
-    // if there is a single file and it is a jsonl or alife file, then finalise
+    // if there is a single alife file, then finalise automatically
     if (
       inputs.length === 1 &&
-      (inputs[0].filetype === "jsonl" || inputs[0].filetype === "alife")
+      (inputs[0].filetype === "alife_csv" || inputs[0].filetype === "alife_tsv" || inputs[0].filetype === "alife_parquet")
     ) {
       finaliseInputs();
     }
   }, [inputs, finaliseInputs]);
 
   useEffect(() => {
-    if (query.protoUrl && !uploadedData) {
-      setUploadedData({
-        status: "url_supplied",
-        filename: query.protoUrl,
-        filetype: "jsonl",
-      });
-    }
+    // if (query.protoUrl && !uploadedData) {
+    //   setUploadedData({
+    //     status: "url_supplied",
+    //     filename: query.protoUrl,
+    //     filetype: "jsonl",
+    //   });
+    // }
     if (query.treeUrl && !uploadedData) {
       console.log("tree url set");
-      const extra = {};
-      if (query.metaUrl) {
-        extra.metadata = {
-          filename: query.metaUrl,
-          filetype: query.metaType
-            ? query.metaType
-            : query.metaUrl.includes("csv")
-            ? "meta_csv"
-            : "meta_tsv",
-          status: "url_supplied",
-          taxonColumn: query.taxonColumn,
-        };
-      }
       setUploadedData({
         status: "url_supplied",
         filename: query.treeUrl,
         ladderize: query.ladderizeTree === "true",
-        filetype: query.treeType ? query.treeType : "nwk",
-        ...extra,
+        filetype: query.treeType ? query.treeType : "alife_csv",
       });
     }
   }, [query, setUploadedData, uploadedData]);

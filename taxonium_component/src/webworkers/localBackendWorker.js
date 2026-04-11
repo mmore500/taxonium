@@ -1,16 +1,17 @@
 import filtering from "taxonium_data_handling/filtering.js";
-import { getNextstrainSubtreeJson } from "taxonium_data_handling/exporting.js";
+// import { getNextstrainSubtreeJson } from "taxonium_data_handling/exporting.js";
 import {
-  processJsonl,
+  // processJsonl,
   generateConfig,
 } from "taxonium_data_handling/importing.js";
-import { processNewickAndMetadata } from "../utils/processNewick";
-import { processNextstrain } from "../utils/processNextstrain.js";
+// import { processNewickAndMetadata } from "../utils/processNewick";
+// import { processNextstrain } from "../utils/processNextstrain.js";
 import { processAlife } from "../utils/processAlife";
-import { ReadableWebToNodeStream } from "readable-web-to-node-stream";
-import { parser } from "stream-json";
-import { streamValues } from "stream-json/streamers/StreamValues";
-import { Buffer } from "buffer";
+import { processAlifeParquet } from "../utils/processAlifeParquet";
+// import { ReadableWebToNodeStream } from "readable-web-to-node-stream";
+// import { parser } from "stream-json";
+// import { streamValues } from "stream-json/streamers/StreamValues";
+// import { Buffer } from "buffer";
 
 postMessage({ data: "Worker starting" });
 
@@ -187,56 +188,67 @@ const getList = async (node_id, att) => {
 onmessage = async (event) => {
   //Process uploaded data:
   const { data } = event;
+  // if (
+  //   data.type === "upload" &&
+  //   data.data &&
+  //   data.data.filename &&
+  //   data.data.filename.includes("jsonl")
+  // ) {
+  //   processedUploadedData = await processJsonl(
+  //     data.data,
+  //     sendStatusMessage,
+  //     ReadableWebToNodeStream,
+  //     parser,
+  //     streamValues,
+  //     Buffer
+  //   );
+  //
+  // } else if (
+  //   data.type === "upload" &&
+  //   data.data &&
+  //   data.data.filename &&
+  //   (data.data.filetype === "nwk" || data.data.filetype === "nexus")
+  // ) {
+  //   data.data.useDistances = true;
+  //   processedUploadedData = await processNewickAndMetadata(
+  //     data.data,
+  //     sendStatusMessage
+  //   );
+  // } else if (
+  //   data.type === "upload" &&
+  //   data.data &&
+  //   data.data.filename &&
+  //   data.data.filetype === "nextstrain"
+  // ) {
+  //   processedUploadedData = await processNextstrain(
+  //     data.data,
+  //     sendStatusMessage
+  //   );
+  // } else
   if (
     data.type === "upload" &&
     data.data &&
     data.data.filename &&
-    data.data.filename.includes("jsonl")
-  ) {
-    processedUploadedData = await processJsonl(
-      data.data,
-      sendStatusMessage,
-      ReadableWebToNodeStream,
-      parser,
-      streamValues,
-      Buffer
-    );
-
-  } else if (
-    data.type === "upload" &&
-    data.data &&
-    data.data.filename &&
-    (data.data.filetype === "nwk" || data.data.filetype === "nexus")
-  ) {
-    data.data.useDistances = true;
-    processedUploadedData = await processNewickAndMetadata(
-      data.data,
-      sendStatusMessage
-    );
-  } else if (
-    data.type === "upload" &&
-    data.data &&
-    data.data.filename &&
-    data.data.filetype === "nextstrain"
-  ) {
-    processedUploadedData = await processNextstrain(
-      data.data,
-      sendStatusMessage
-    );
-  } else if (
-    data.type === "upload" &&
-    data.data &&
-    data.data.filename &&
-    data.data.filetype === "alife"
+    (data.data.filetype === "alife_csv" || data.data.filetype === "alife_tsv")
   ) {
     processedUploadedData = await processAlife(
+      data.data,
+      sendStatusMessage
+    );
+  } else if (
+    data.type === "upload" &&
+    data.data &&
+    data.data.filename &&
+    data.data.filetype === "alife_parquet"
+  ) {
+    processedUploadedData = await processAlifeParquet(
       data.data,
       sendStatusMessage
     );
   } else if (data.type === "upload" && data.data && data.data.filename) {
     sendStatusMessage({
       error:
-        "Only Taxonium jsonl files are supported (could not find 'jsonl' in filename)",
+        "Only ALife Standard files (CSV, TSV, or Parquet) are supported",
     });
   } else {
     if (data.type === "query") {
@@ -259,14 +271,14 @@ onmessage = async (event) => {
       const result = await getList(data.node_id, data.key);
       postMessage({ type: "list", data: result });
     }
-    if (data.type === "nextstrain") {
-      const result = await getNextstrainSubtreeJson(
-        data.node_id,
-        processedUploadedData.nodes,
-        data.config,
-        processedUploadedData.mutations
-      );
-      postMessage({ type: "nextstrain", data: result });
-    }
+    // if (data.type === "nextstrain") {
+    //   const result = await getNextstrainSubtreeJson(
+    //     data.node_id,
+    //     processedUploadedData.nodes,
+    //     data.config,
+    //     processedUploadedData.mutations
+    //   );
+    //   postMessage({ type: "nextstrain", data: result });
+    // }
   }
 };

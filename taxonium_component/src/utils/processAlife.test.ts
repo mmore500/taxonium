@@ -7,7 +7,7 @@ function makeAlifeFile(csvText: string, opts?: Partial<AlifeFile>): AlifeFile {
     status: "loaded",
     filename: "test.csv",
     data: csvText,
-    filetype: "alife",
+    filetype: "alife_csv",
     ladderize: false,
     ...opts,
   };
@@ -200,7 +200,7 @@ describe("processAlife", () => {
 
       await expect(
         processAlife(makeAlifeFile(csv), noopStatus)
-      ).rejects.toThrow("ALife CSV contains no valid data rows");
+      ).rejects.toThrow("ALife data contains no valid data rows");
     });
   });
 
@@ -241,7 +241,7 @@ describe("processAlife", () => {
       await expect(
         processAlife(makeAlifeFile(csv), noopStatus)
       ).rejects.toThrow(
-        "ALife CSV must have an 'ancestor_list' or 'ancestor_id' column"
+        "ALife data must have an 'ancestor_list' or 'ancestor_id' column"
       );
     });
   });
