@@ -207,6 +207,10 @@ export async function buildAlifeTreeFromParsedData(
   if (rootNodes.length === 1) {
     root = rootNodes[0];
   } else {
+    // Warn about multiple roots before creating synthetic root
+    sendStatusMessage({
+      message: `Warning: Found ${rootNodes.length} root nodes. Creating a synthetic root to connect them.`,
+    });
     // Multiple roots - create synthetic root to connect them
     root = {
       parent: null,
