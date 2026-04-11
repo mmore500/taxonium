@@ -131,6 +131,28 @@ describe("buildAlifeTreeFromParsedData", () => {
     expect(syntheticRoot).toBeDefined();
   });
 
+  it("treats self-referencing ancestor_id as root", async () => {
+    const parsedMap = new Map<string, Record<string, string>>();
+    parsedMap.set("0", { meta_ancestor_id: "0" });
+    parsedMap.set("1", { meta_ancestor_id: "0" });
+    parsedMap.set("2", { meta_ancestor_id: "0" });
+    parsedMap.set("3", { meta_ancestor_id: "1" });
+    const headers = ["id", "ancestor_id"];
+
+    const result = await buildAlifeTreeFromParsedData(
+      parsedMap,
+      headers,
+      false,
+      noopStatus
+    );
+
+    expect(result.nodes.length).toBe(4);
+    const root = result.nodes.find((n: any) => n.name === "0");
+    expect(root).toBeDefined();
+    expect(root!.parent_id).toBe(root!.node_id);
+    expect(result.overwrite_config.num_tips).toBe(2); // nodes 2, 3
+  });
+
   it("ladderizes when requested", async () => {
     const parsedMap = new Map<string, Record<string, string>>();
     parsedMap.set("0", { meta_ancestor_id: "" });

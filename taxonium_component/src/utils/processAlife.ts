@@ -183,7 +183,7 @@ export async function buildAlifeTreeFromParsedData(
     const node = nodeById.get(row.id)!;
     const parentId = resolveParentId(row.fields, hasAncestorId, hasAncestorList);
 
-    if (parentId === null) {
+    if (parentId === null || parentId === row.id) {
       rootNodes.push(node);
     } else {
       const parentNode = nodeById.get(parentId);

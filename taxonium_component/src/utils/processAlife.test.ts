@@ -267,4 +267,44 @@ describe("processAlife", () => {
       expect(result.overwrite_config.num_tips).toBe(4); // nodes 2, 3, 4, 5
     });
   });
+
+  describe("self-referencing root (ancestor_id === id)", () => {
+    it("treats self-referencing node as root", async () => {
+      const csv = [
+        "id,ancestor_id",
+        "0,0",
+        "1,0",
+        "2,0",
+        "3,1",
+        "4,1",
+      ].join("\n");
+
+      const result = await processAlife(makeAlifeFile(csv), noopStatus);
+
+      expect(result.nodes.length).toBe(5);
+      expect(result.overwrite_config.num_tips).toBe(3); // nodes 2, 3, 4
+      const root = result.nodes.find((n: any) => n.name === "0");
+      expect(root).toBeDefined();
+      expect(root!.parent_id).toBe(root!.node_id);
+    });
+
+    it("handles multiple self-referencing roots", async () => {
+      const csv = [
+        "id,ancestor_id",
+        "0,0",
+        "1,0",
+        "10,10",
+        "11,10",
+      ].join("\n");
+
+      const result = await processAlife(makeAlifeFile(csv), noopStatus);
+
+      // 4 data nodes + 1 synthetic root = 5
+      expect(result.nodes.length).toBe(5);
+      const syntheticRoot = result.nodes.find(
+        (n: any) => n.name === "synthetic_root"
+      );
+      expect(syntheticRoot).toBeDefined();
+    });
+  });
 });
