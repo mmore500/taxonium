@@ -236,7 +236,7 @@ export const useInputHelper = ({
       setUploadedData({
         status: "url_supplied",
         filename: query.treeUrl,
-        ladderize: query.ladderizeTree === "true",
+        ladderize: query.ladderizeTree === "true" || query.ladderizeTree === true,
         filetype: query.treeType ? query.treeType : "alife_csv",
       });
     }
