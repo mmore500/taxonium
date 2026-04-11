@@ -12,7 +12,13 @@ export async function processAlifeParquet(
   let arrayBuffer: ArrayBuffer;
   if (data.status === "url_supplied") {
     sendStatusMessage({ message: "Downloading ALife Parquet file" });
-    const response = await fetch(data.filename);
+    // Resolve relative/absolute-path URLs against the origin since
+    // fetch() inside a blob: web worker can't resolve bare paths.
+    let url = data.filename;
+    if (url.startsWith("/")) {
+      url = self.location.origin + url;
+    }
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch parquet file: ${response.status} ${response.statusText}`);
     }
