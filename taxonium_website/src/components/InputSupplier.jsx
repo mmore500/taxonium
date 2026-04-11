@@ -164,8 +164,16 @@ export const InputSupplier = ({ inputHelper, className }) => {
         </div>
       )}
       <div className="mb-3">
-        Select, drag-and-drop, or enter the URL for ALife Standard files
-        (CSV, TSV, or Parquet):
+        Select, drag-and-drop, or enter the URL for{" "}
+        <a
+          href="https://alife-data-standards.github.io/alife-data-standards/phylogeny.html"
+          className="underline hover:no-underline text-blue-600"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ALife Standard
+        </a>{" "}
+        files (CSV, TSV, or Parquet):
       </div>
       {!addingText && (
         <>

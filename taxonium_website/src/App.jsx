@@ -148,7 +148,7 @@ function App() {
       title: config.title,
       url: `${BASE}${path}`,
       desc: config.description,
-      icon: config.icon,
+      icon: config.icon ? `${BASE}${config.icon.replace(/^\//, "")}` : null,
       maintainerMessage: config.maintainerMessage,
     };
   }).filter(Boolean); // Remove any null entries from missing configs
@@ -218,7 +218,7 @@ function App() {
                       pathConfig.maintainerMessage &&
                       pathConfig.icon && (
                         <img
-                          src={pathConfig.icon}
+                          src={`${BASE}${pathConfig.icon.replace(/^\//, "")}`}
                           className="w-6 h-6  rounded border-gray-400 border inline-block"
                           title={pathConfig.maintainerMessage}
                         />
@@ -321,11 +321,13 @@ function App() {
                         className="text-gray-800 hover:underline"
                         target="_top"
                       >
-                        <img
-                          src={item.icon}
-                          className="w-6 h-6 rounded border-gray-500 mb-2 inline-block mr-2"
-                          title={item.maintainerMessage}
-                        />
+                        {item.icon && (
+                          <img
+                            src={item.icon}
+                            className="w-6 h-6 rounded border-gray-500 mb-2 inline-block mr-2"
+                            title={item.maintainerMessage}
+                          />
+                        )}
                         {item.title}
                       </a>
                       <p className="text-gray-600 text-sm">{item.desc}</p>
