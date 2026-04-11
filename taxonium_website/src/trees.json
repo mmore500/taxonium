@@ -1,4 +1,20 @@
 {
+  "wse/neutral": {
+    "treeUrl": "https://osf.io/download/pfvsg",
+    "treeType": "alife_parquet",
+    "ladderizeTree": true,
+    "title": "WSE Neutral Evolution",
+    "description": "Wafer-Scale Engine simulation, neutral evolution",
+    "icon": "/assets/people.png"
+  },
+  "wse/adaptive": {
+    "treeUrl": "https://osf.io/download/nk69s",
+    "treeType": "alife_parquet",
+    "ladderizeTree": true,
+    "title": "WSE Adaptive Evolution",
+    "description": "Wafer-Scale Engine simulation, adaptive evolution",
+    "icon": "/assets/people.png"
+  },
   "atb": {
     "protoUrl": "https://cov2tree.nyc3.cdn.digitaloceanspaces.com/atb/ATB_tree2.jsonl.gz",
     "title": "AllTheBacteria",

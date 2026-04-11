@@ -8,11 +8,16 @@ export async function processAlifeParquet(
   data: AlifeParquetFile,
   sendStatusMessage: (msg: StatusMessage) => void
 ): Promise<ProcessedTree> {
-  sendStatusMessage({ message: "Parsing ALife Parquet file" });
-
-  // Get the ArrayBuffer from the uploaded file data
+  // Get the ArrayBuffer: fetch from URL or use uploaded data
   let arrayBuffer: ArrayBuffer;
-  if (data.data instanceof ArrayBuffer) {
+  if (data.status === "url_supplied") {
+    sendStatusMessage({ message: "Downloading ALife Parquet file" });
+    const response = await fetch(data.filename);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch parquet file: ${response.statusText}`);
+    }
+    arrayBuffer = await response.arrayBuffer();
+  } else if (data.data instanceof ArrayBuffer) {
     arrayBuffer = data.data;
   } else if (typeof data.data === "string") {
     const encoder = new TextEncoder();
@@ -20,6 +25,8 @@ export async function processAlifeParquet(
   } else {
     throw new Error("Parquet file data must be an ArrayBuffer");
   }
+
+  sendStatusMessage({ message: "Parsing ALife Parquet file" });
 
   // Read parquet file into array of row objects
   const rows = await parquetReadObjects({

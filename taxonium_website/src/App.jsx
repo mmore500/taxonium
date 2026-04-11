@@ -15,15 +15,8 @@ import { Select } from "./components/Basic";
 
 // Hardcoded list of paths to show in the showcase
 const SHOWCASE_PATHS = [
-  "sars-cov-2/public",
-  "atb",
-  "taxonomy/visual",
-  "taxonomy/full",
-  "tuberculosis/SRA",
-  "mpox/clade-I",
-  "mpox/clade-IIb",
-  "flu/H5N1-Outbreak",
-  "flu/H5N1-Outbreak-D1-1",
+  "wse/neutral",
+  "wse/adaptive",
 ];
 
 const BASE = import.meta.env.BASE_URL || "/";
