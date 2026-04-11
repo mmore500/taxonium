@@ -26,6 +26,8 @@ const SHOWCASE_PATHS = [
   "flu/H5N1-Outbreak-D1-1",
 ];
 
+const BASE = import.meta.env.BASE_URL || "/";
+
 function checkLegacyHostname() {
   const currentHostname = window.location.hostname;
 
@@ -56,8 +58,13 @@ function getConfigFromPath() {
     return null; // Return null as we're about to redirect
   }
 
-  // Remove leading slash and get full path
-  const path = window.location.pathname.substring(1);
+  // Remove base path prefix and leading slash
+  let path = window.location.pathname;
+  if (BASE !== "/" && path.startsWith(BASE)) {
+    path = path.substring(BASE.length);
+  } else {
+    path = path.substring(1);
+  }
   const decodedPath = decodeURIComponent(path);
 
   // Return the configuration for this path, if it exists
@@ -146,7 +153,7 @@ function App() {
     }
     return {
       title: config.title,
-      url: `/${path}`,
+      url: `${BASE}${path}`,
       desc: config.description,
       icon: config.icon,
       maintainerMessage: config.maintainerMessage,
@@ -155,7 +162,7 @@ function App() {
 
   useEffect(() => {
     if (selectedTree) {
-      const newPath = `/${selectedTree}${window.location.search}`;
+      const newPath = `${BASE}${selectedTree}${window.location.search}`;
       window.location.href = newPath; // Trigger a page refresh on selection change
     }
   }, [selectedTree]);
@@ -202,7 +209,7 @@ function App() {
                     <span className="flex flex-col text-center">
                       <span className="text-xs">visualised with</span>
                       <a
-                        href="/"
+                        href={BASE}
                         className="underline hover:no-underline text-sm flex items-center"
                         target="_top"
                       >
@@ -234,7 +241,7 @@ function App() {
                       <CgListTree className="h- ml-1 w-4 mr-1" />
                       <span className="text-xs ml-1">visualised with </span>
                       <a
-                        href="/"
+                        href={BASE}
                         className="underline hover:no-underline text-xs ml-0.5"
                         target="_top"
                       >
@@ -245,7 +252,7 @@ function App() {
                 )}
               </>
             ) : (
-              <a href="/" className="hover:underline" target="_top">
+              <a href={BASE} className="hover:underline" target="_top">
                 <CgListTree className="h-6 w-6 inline-block mr-2 -mt-1" />
                 <span className="font-bold">Taxonium</span>
               </a>
