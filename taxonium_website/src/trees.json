@@ -1,6 +1,6 @@
 {
   "wse/neutral": {
-    "treeUrl": "https://proxy.taxonium.org/proxy?url=https%3A%2F%2Fosf.io%2Fdownload%2Fpfvsg",
+    "treeUrl": "/taxonium/data/wse-neutral.parquet",
     "treeType": "alife_parquet",
     "ladderizeTree": true,
     "title": "WSE Neutral Evolution",
@@ -8,7 +8,7 @@
     "icon": "/assets/people.png"
   },
   "wse/adaptive": {
-    "treeUrl": "https://proxy.taxonium.org/proxy?url=https%3A%2F%2Fosf.io%2Fdownload%2Fnk69s",
+    "treeUrl": "/taxonium/data/wse-adaptive.parquet",
     "treeType": "alife_parquet",
     "ladderizeTree": true,
     "title": "WSE Adaptive Evolution",
