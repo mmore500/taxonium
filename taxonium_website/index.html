@@ -53,6 +53,16 @@
 
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script>
+      // GitHub Pages SPA redirect: restore path from 404.html redirect
+      (function() {
+        var redirect = sessionStorage.getItem('ghPagesRedirect');
+        if (redirect) {
+          sessionStorage.removeItem('ghPagesRedirect');
+          window.history.replaceState(null, '', '/' + redirect);
+        }
+      })();
+    </script>
     <div id="root"></div>
     <!--
       This HTML file is a template.

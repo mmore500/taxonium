@@ -13,12 +13,15 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 const prettyTypes = {
-  jsonl: "Taxonium JSONL",
-  nwk: "Newick tree",
-  nexus: "Nexus tree",
-  meta_tsv: "Metadata TSV",
-  meta_csv: "Metadata CSV",
-  nextstrain: "Nextstrain JSON",
+  // jsonl: "Taxonium JSONL",
+  // nwk: "Newick tree",
+  // nexus: "Nexus tree",
+  alife_csv: "ALife Standard CSV",
+  alife_tsv: "ALife Standard TSV",
+  alife_parquet: "ALife Standard Parquet",
+  // meta_tsv: "Metadata TSV",
+  // meta_csv: "Metadata CSV",
+  // nextstrain: "Nextstrain JSON",
   unknown: "Unknown (please select)",
 };
 const fileTypes = Object.keys(prettyTypes);
@@ -96,7 +99,7 @@ export const InputSupplier = ({ inputHelper, className }) => {
                 <BsTrash className="inline-block mx-1" />
               </Button>
             </div>{" "}
-            {input.filetype === "nwk" && (
+            {(input.filetype === "nwk" || input.filetype === "alife_csv" || input.filetype === "alife_tsv" || input.filetype === "alife_parquet") && (
               <div>
                 <label>
                   <input
@@ -161,8 +164,16 @@ export const InputSupplier = ({ inputHelper, className }) => {
         </div>
       )}
       <div className="mb-3">
-        Select, drag-and-drop, or enter the URL for tree or metadata files
-        (jsonl, newick, nextstrain, tsv, etc.):
+        Select, drag-and-drop, or enter the URL for{" "}
+        <a
+          href="https://alife-data-standards.github.io/alife-data-standards/phylogeny.html"
+          className="underline hover:no-underline text-blue-600"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ALife Standard
+        </a>{" "}
+        files (CSV, TSV, or Parquet):
       </div>
       {!addingText && (
         <>

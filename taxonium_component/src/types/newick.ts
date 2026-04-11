@@ -17,6 +17,16 @@ export interface NewickFile extends InputFile {
   taxonColumn?: string;
 }
 
+export interface AlifeFile extends InputFile {
+  filetype: "alife_csv" | "alife_tsv";
+  ladderize?: boolean;
+}
+
+export interface AlifeParquetFile extends InputFile {
+  filetype: "alife_parquet";
+  ladderize?: boolean;
+}
+
 import type { Node, Mutation } from "./node";
 
 export interface ProcessedTree {

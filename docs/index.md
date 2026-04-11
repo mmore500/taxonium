@@ -45,6 +45,12 @@ Optionally, you can also upload a metadata file with your tree. This file should
 
 Taxonium can also display JSONL files containing mutation-annotated trees (discussed below), and JSON files created by [Nextstrain Augur](https://github.com/nextstrain/augur). We have added experimental support for Nexus trees.
 
+#### ALife Standard phylogeny CSV
+
+Taxonium supports CSV files following the [ALife Data Standard](https://alife-data-standards.github.io/alife-data-standards/phylogeny.html) for phylogenetic data. These files represent a phylogeny as a tabular edge list: each row defines a node via its `id` and its parent via `ancestor_list` or `ancestor_id`. This is analogous to the `edge` matrix in R's ape `phylo` object, where each entry pairs a parent node to a child node. If an `origin_time` column is present, branch lengths are computed as the difference between a node's origin time and its parent's origin time (similar to `edge.length` in a `phylo` object). Any additional columns are treated as node metadata.
+
+To use this format, upload your CSV file and select "ALife Standard CSV" from the file type dropdown.
+
 ### Viewing the global SARS-CoV-2 tree
 
 We maintain an instance of Taxonium that displays a version of the SARS-CoV-2 global public tree built by the UShER team, at [Cov2Tree.org](http://cov2tree.org).

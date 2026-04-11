@@ -15,16 +15,11 @@ import { Select } from "./components/Basic";
 
 // Hardcoded list of paths to show in the showcase
 const SHOWCASE_PATHS = [
-  "sars-cov-2/public",
-  "atb",
-  "taxonomy/visual",
-  "taxonomy/full",
-  "tuberculosis/SRA",
-  "mpox/clade-I",
-  "mpox/clade-IIb",
-  "flu/H5N1-Outbreak",
-  "flu/H5N1-Outbreak-D1-1",
+  "wse/neutral",
+  "wse/adaptive",
 ];
+
+const BASE = import.meta.env.BASE_URL || "/";
 
 function checkLegacyHostname() {
   const currentHostname = window.location.hostname;
@@ -56,8 +51,13 @@ function getConfigFromPath() {
     return null; // Return null as we're about to redirect
   }
 
-  // Remove leading slash and get full path
-  const path = window.location.pathname.substring(1);
+  // Remove base path prefix and leading slash
+  let path = window.location.pathname;
+  if (BASE !== "/" && path.startsWith(BASE)) {
+    path = path.substring(BASE.length);
+  } else {
+    path = path.substring(1);
+  }
   const decodedPath = decodeURIComponent(path);
 
   // Return the configuration for this path, if it exists
@@ -146,16 +146,16 @@ function App() {
     }
     return {
       title: config.title,
-      url: `/${path}`,
+      url: `${BASE}${path}`,
       desc: config.description,
-      icon: config.icon,
+      icon: config.icon ? `${BASE}${config.icon.replace(/^\//, "")}` : null,
       maintainerMessage: config.maintainerMessage,
     };
   }).filter(Boolean); // Remove any null entries from missing configs
 
   useEffect(() => {
     if (selectedTree) {
-      const newPath = `/${selectedTree}${window.location.search}`;
+      const newPath = `${BASE}${selectedTree}${window.location.search}`;
       window.location.href = newPath; // Trigger a page refresh on selection change
     }
   }, [selectedTree]);
@@ -202,7 +202,7 @@ function App() {
                     <span className="flex flex-col text-center">
                       <span className="text-xs">visualised with</span>
                       <a
-                        href="/"
+                        href={BASE}
                         className="underline hover:no-underline text-sm flex items-center"
                         target="_top"
                       >
@@ -218,7 +218,7 @@ function App() {
                       pathConfig.maintainerMessage &&
                       pathConfig.icon && (
                         <img
-                          src={pathConfig.icon}
+                          src={`${BASE}${pathConfig.icon.replace(/^\//, "")}`}
                           className="w-6 h-6  rounded border-gray-400 border inline-block"
                           title={pathConfig.maintainerMessage}
                         />
@@ -234,7 +234,7 @@ function App() {
                       <CgListTree className="h- ml-1 w-4 mr-1" />
                       <span className="text-xs ml-1">visualised with </span>
                       <a
-                        href="/"
+                        href={BASE}
                         className="underline hover:no-underline text-xs ml-0.5"
                         target="_top"
                       >
@@ -245,7 +245,7 @@ function App() {
                 )}
               </>
             ) : (
-              <a href="/" className="hover:underline" target="_top">
+              <a href={BASE} className="hover:underline" target="_top">
                 <CgListTree className="h-6 w-6 inline-block mr-2 -mt-1" />
                 <span className="font-bold">Taxonium</span>
               </a>
@@ -321,11 +321,13 @@ function App() {
                         className="text-gray-800 hover:underline"
                         target="_top"
                       >
-                        <img
-                          src={item.icon}
-                          className="w-6 h-6 rounded border-gray-500 mb-2 inline-block mr-2"
-                          title={item.maintainerMessage}
-                        />
+                        {item.icon && (
+                          <img
+                            src={item.icon}
+                            className="w-6 h-6 rounded border-gray-500 mb-2 inline-block mr-2"
+                            title={item.maintainerMessage}
+                          />
+                        )}
                         {item.title}
                       </a>
                       <p className="text-gray-600 text-sm">{item.desc}</p>
