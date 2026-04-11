@@ -32,7 +32,9 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
       - name: Install and build website
         working-directory: taxonium_website
-        run: npm install --force && npm run build
+        run: npm install --ignore-scripts --force && npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
