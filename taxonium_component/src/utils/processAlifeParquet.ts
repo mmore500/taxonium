@@ -1,5 +1,6 @@
 import { parquetReadObjects } from "hyparquet";
 import { compressors } from "hyparquet-compressors";
+import axios from "axios";
 import { buildAlifeTreeFromParsedData } from "./processAlife";
 import type { StatusMessage } from "../types/backend";
 import type { AlifeParquetFile, ProcessedTree } from "../types/newick";
@@ -12,11 +13,16 @@ export async function processAlifeParquet(
   let arrayBuffer: ArrayBuffer;
   if (data.status === "url_supplied") {
     sendStatusMessage({ message: "Downloading ALife Parquet file" });
-    const response = await fetch(data.filename);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch parquet file: ${response.statusText}`);
-    }
-    arrayBuffer = await response.arrayBuffer();
+    const response = await axios.get(data.filename, {
+      responseType: "arraybuffer",
+      onDownloadProgress: (progress) => {
+        sendStatusMessage({
+          message: "Downloading ALife Parquet file",
+          percentage: (progress.loaded / (progress.total ?? progress.loaded)) * 100,
+        });
+      },
+    });
+    arrayBuffer = response.data;
   } else if (data.data instanceof ArrayBuffer) {
     arrayBuffer = data.data;
   } else if (typeof data.data === "string") {
